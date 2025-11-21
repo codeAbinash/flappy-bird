@@ -7,7 +7,16 @@ import SoundToggle from './SoundToggle';
 function GameComponent() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [stateManager, setStateManager] = useState<GameStateManager | null>(null);
+    const [gameState, setGameState] = useState<GameState>(GameState.TITLE);
+    const [score, setScore] = useState(0);
+    const [highScore, setHighScore] = useState(0);
     const location = useLocation();
+
+    const handleRestart = () => {
+        if (stateManager) {
+            stateManager.restart();
+        }
+    };
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -48,7 +57,15 @@ function GameComponent() {
         canvasRef.current.style.height = `${displayHeight}px`;
 
         // Initialize game with current route (pass logical size, not physical pixels)
-        const manager = new GameStateManager(canvasRef.current, location.pathname, displayWidth, displayHeight);
+        const manager = new GameStateManager(
+            canvasRef.current,
+            location.pathname,
+            displayWidth,
+            displayHeight,
+            (state: GameState) => setGameState(state),
+            (currentScore: number) => setScore(currentScore),
+            (best: number) => setHighScore(best)
+        );
         setStateManager(manager);
 
         const gameLoop = new GameLoop(manager);
@@ -84,6 +101,34 @@ function GameComponent() {
                     WebkitTapHighlightColor: 'transparent',
                 }}
             />
+
+            {/* Score Display - Top Right */}
+            {gameState === GameState.PLAYING && (
+                <div className="absolute top-8 right-8 text-white text-5xl font-bold drop-shadow-lg">{score}</div>
+            )}
+
+            {/* Game Over Overlay */}
+            {gameState === GameState.GAME_OVER && (
+                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-gray-800 rounded-2xl p-8 shadow-2xl text-center max-w-md mx-4">
+                        <h1 className="text-5xl font-bold text-white mb-6">Game Over</h1>
+                        <div className="space-y-4 mb-8">
+                            <div className="text-3xl text-gray-300">
+                                Score: <span className="text-white font-bold">{score}</span>
+                            </div>
+                            <div className="text-3xl text-gray-300">
+                                High Score: <span className="text-yellow-400 font-bold">{highScore}</span>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleRestart}
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-2xl py-4 px-8 rounded-lg transition-colors duration-200">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <SoundToggle />
         </div>
     );

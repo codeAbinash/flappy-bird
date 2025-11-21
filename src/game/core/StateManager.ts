@@ -43,8 +43,19 @@ export class GameStateManager {
     private displayWidth: number;
     private displayHeight: number;
     private scale: number;
+    private onStateChange?: (state: GameState) => void;
+    private onScoreChange?: (score: number) => void;
+    private onHighScoreChange?: (highScore: number) => void;
 
-    constructor(canvas: HTMLCanvasElement, route: string = '/', displayWidth?: number, displayHeight?: number) {
+    constructor(
+        canvas: HTMLCanvasElement,
+        route: string = '/',
+        displayWidth?: number,
+        displayHeight?: number,
+        onStateChange?: (state: GameState) => void,
+        onScoreChange?: (score: number) => void,
+        onHighScoreChange?: (highScore: number) => void
+    ) {
         this.canvas = canvas;
         const context = canvas.getContext('2d');
         if (!context) {
@@ -52,6 +63,9 @@ export class GameStateManager {
         }
         this.ctx = context;
         this.assets = getAssets(route);
+        this.onStateChange = onStateChange;
+        this.onScoreChange = onScoreChange;
+        this.onHighScoreChange = onHighScoreChange;
 
         // Use logical display size for game coordinates
         this.displayWidth = displayWidth || canvas.width;
@@ -81,6 +95,14 @@ export class GameStateManager {
 
         this.setupInputHandlers();
         this.changeState(GameState.TITLE);
+
+        // Notify initial states
+        if (this.onHighScoreChange) {
+            this.onHighScoreChange(this.highScore);
+        }
+        if (this.onScoreChange) {
+            this.onScoreChange(this.score);
+        }
     }
 
     private initializeBackgroundElements(): void {
@@ -146,7 +168,18 @@ export class GameStateManager {
         if (this.score > this.highScore) {
             this.highScore = this.score;
             localStorage.setItem('flappyBirdHighScore', this.highScore.toString());
+
+            // Notify high score change
+            if (this.onHighScoreChange) {
+                this.onHighScoreChange(this.highScore);
+            }
         }
+    }
+
+    public restart(): void {
+        this.resetGame();
+        this.changeState(GameState.READY);
+        this.audioManager.play('swoosh');
     }
 
     public changeState(newState: GameState): void {
@@ -161,6 +194,11 @@ export class GameStateManager {
             this.inputManager.setEnabled(false);
         } else if (newState === GameState.PLAYING) {
             this.inputManager.setEnabled(true);
+        }
+
+        // Notify state change
+        if (this.onStateChange) {
+            this.onStateChange(newState);
         }
     }
 
@@ -235,6 +273,11 @@ export class GameStateManager {
                 this.score++;
                 pipe.setScored();
                 this.audioManager.play('score');
+
+                // Notify score change
+                if (this.onScoreChange) {
+                    this.onScoreChange(this.score);
+                }
             }
         }
 
@@ -349,12 +392,6 @@ export class GameStateManager {
         }
 
         this.bird.render(this.ctx);
-
-        // Score with shadow
-        this.ctx.fillStyle = window.location.pathname === '/black-humor' ? '#FFF' : '#000';
-        this.ctx.font = 'bold 40px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.score.toString(), this.displayWidth / 2, 50);
     }
 
     private renderDying(): void {
@@ -369,12 +406,6 @@ export class GameStateManager {
                 this.assets.explosion.renderFrame2(this.ctx, this.deathPosition.x, this.deathPosition.y);
             }
         }
-
-        // Score display
-        this.ctx.fillStyle = '#FFF';
-        this.ctx.font = 'bold 40px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.score.toString(), this.displayWidth / 2, 50);
     }
 
     private renderGameOver(): void {
@@ -391,23 +422,5 @@ export class GameStateManager {
         } else {
             this.bird.render(this.ctx);
         }
-
-        // Semi-transparent overlay
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
-
-        // Game over text with shadow
-        this.ctx.fillStyle = '#FFF';
-        this.ctx.font = 'bold 40px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.fillText('Game Over', this.displayWidth / 2, this.displayHeight / 2 - 50);
-
-        // Score display
-        this.ctx.font = '30px Arial';
-        this.ctx.fillText(`Score: ${this.score}`, this.displayWidth / 2, this.displayHeight / 2);
-        this.ctx.fillText(`High Score: ${this.highScore}`, this.displayWidth / 2, this.displayHeight / 2 + 40);
-
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText('Click to Try Again', this.displayWidth / 2, this.displayHeight / 2 + 80);
     }
 }
