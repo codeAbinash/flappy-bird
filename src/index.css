@@ -4,27 +4,28 @@
 
 /* Disable text selection */
 * {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /* Remove tap highlight on mobile */
 * {
-  -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
 /* Prevent pull-to-refresh and overscroll behaviors */
-html, body {
-  overscroll-behavior: none;
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
+html,
+body {
+    overscroll-behavior: none;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 /* Ensure touch events don't trigger unwanted behaviors */
 canvas {
-  touch-action: none;
+    touch-action: none;
 }

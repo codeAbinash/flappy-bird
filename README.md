@@ -5,16 +5,17 @@ A modern implementation of the classic Flappy Bird game built with React, TypeSc
 ## Features
 
 - Classic Flappy Bird gameplay mechanics
--  Smooth animations and particle effects
--  Sound effects with mute option
--  Local storage for high scores
--  Responsive design for all devices
--  Dynamic day/night themes
--  Score tracking system
+- Smooth animations and particle effects
+- Sound effects with mute option
+- Local storage for high scores
+- Responsive design for all devices
+- Dynamic day/night themes
+- Score tracking system
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - [Node.js](https://nodejs.org/) (v18 or higher)
 - [npm](https://www.npmjs.com/) (v8 or higher)
 - [Docker](https://www.docker.com/) (optional, for containerized deployment)
@@ -22,25 +23,28 @@ Before you begin, ensure you have the following installed:
 ## Development Setup
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/robert-kratz/flappy-bird.git
-   cd flappy-bird
-   ```
+
+    ```bash
+    git clone https://github.com/robert-kratz/flappy-bird.git
+    cd flappy-bird
+    ```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+
+    ```bash
+    npm install
+    ```
 
 3. Start the development server:
-   ```bash
-   npm run dev
-   ```
+
+    ```bash
+    npm run dev
+    ```
 
 4. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+    ```
+    http://localhost:3000
+    ```
 
 ## Building for Production
 
@@ -57,23 +61,26 @@ The built files will be in the `dist` directory.
 ### Using Docker Compose (Development)
 
 1. Start the development environment:
-   ```bash
-   docker-compose up
-   ```
+
+    ```bash
+    docker-compose up
+    ```
 
 2. Access the application at `http://localhost:3000`
 
 ### Using Dockerfile (Production)
 
 1. Build the Docker image:
-   ```bash
-   docker build -t flappy-bird .
-   ```
+
+    ```bash
+    docker build -t flappy-bird .
+    ```
 
 2. Run the container:
-   ```bash
-   docker run -p 3000:3000 flappy-bird
-   ```
+
+    ```bash
+    docker run -p 3000:3000 flappy-bird
+    ```
 
 3. Access the application at `http://localhost:3000`
 

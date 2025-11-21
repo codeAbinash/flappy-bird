@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  web:
-    build: .
-    ports:
-      - "8900:3000"  # maps to Nginx
-    environment:
-      - NODE_ENV=production
-    restart: unless-stopped
+    web:
+        build: .
+        ports:
+            - '8900:3000' # maps to Nginx
+        environment:
+            - NODE_ENV=production
+        restart: unless-stopped

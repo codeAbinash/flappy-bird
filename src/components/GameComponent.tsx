@@ -5,91 +5,83 @@ import { GameStateManager, GameState } from '../game/core/StateManager';
 import SoundToggle from './SoundToggle';
 
 function GameComponent() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stateManager, setStateManager] = useState<GameStateManager | null>(null);
-  const location = useLocation();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [stateManager, setStateManager] = useState<GameStateManager | null>(null);
+    const location = useLocation();
 
-  useEffect(() => {
-    if (!canvasRef.current) return;
+    useEffect(() => {
+        if (!canvasRef.current) return;
 
-    // Prevent default touch behaviors
-    const preventDefaultTouch = (e: TouchEvent) => {
-      e.preventDefault();
-    };
+        // Prevent default touch behaviors
+        const preventDefaultTouch = (e: TouchEvent) => {
+            e.preventDefault();
+        };
 
-    // Prevent context menu
-    const preventContextMenu = (e: Event) => {
-      e.preventDefault();
-    };
+        // Prevent context menu
+        const preventContextMenu = (e: Event) => {
+            e.preventDefault();
+        };
 
-    // Prevent selection
-    const preventSelection = (e: Event) => {
-      e.preventDefault();
-    };
+        // Prevent selection
+        const preventSelection = (e: Event) => {
+            e.preventDefault();
+        };
 
-    // Add touch event listeners with passive: false to prevent delay
-    document.addEventListener('touchstart', preventDefaultTouch, { passive: false });
-    document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
-    document.addEventListener('touchend', preventDefaultTouch, { passive: false });
-    
-    // Prevent context menu and selection
-    canvasRef.current.addEventListener('contextmenu', preventContextMenu);
-    canvasRef.current.addEventListener('selectstart', preventSelection);
+        // Add touch event listeners with passive: false to prevent delay
+        document.addEventListener('touchstart', preventDefaultTouch, { passive: false });
+        document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
+        document.addEventListener('touchend', preventDefaultTouch, { passive: false });
 
-    // Set canvas size
-    canvasRef.current.width = 320;
-    canvasRef.current.height = 480;
+        // Prevent context menu and selection
+        canvasRef.current.addEventListener('contextmenu', preventContextMenu);
+        canvasRef.current.addEventListener('selectstart', preventSelection);
 
-    // Initialize game with current route
-    const manager = new GameStateManager(canvasRef.current, location.pathname);
-    setStateManager(manager);
-    
-    const gameLoop = new GameLoop(manager);
-    gameLoop.start();
+        // Set canvas size
+        canvasRef.current.width = 320;
+        canvasRef.current.height = 480;
 
-    // Set initial state from URL hash if present
-    const hash = window.location.hash.slice(1);
-    if (hash && Object.values(GameState).includes(hash as GameState)) {
-      manager.changeState(hash as GameState);
-    }
+        // Initialize game with current route
+        const manager = new GameStateManager(canvasRef.current, location.pathname);
+        setStateManager(manager);
 
-    return () => {
-      // Clean up event listeners
-      document.removeEventListener('touchstart', preventDefaultTouch);
-      document.removeEventListener('touchmove', preventDefaultTouch);
-      document.removeEventListener('touchend', preventDefaultTouch);
-      
-      if (canvasRef.current) {
-        canvasRef.current.removeEventListener('contextmenu', preventContextMenu);
-        canvasRef.current.removeEventListener('selectstart', preventSelection);
-      }
-      
-      manager.cleanup();
-    };
-  }, [location.pathname]);
+        const gameLoop = new GameLoop(manager);
+        gameLoop.start();
 
-  return (
-    <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center touch-none select-none">
-      <canvas
-        ref={canvasRef}
-        className="border border-gray-700 rounded-lg shadow-lg touch-none"
-        style={{
-          imageRendering: 'pixelated',
-          WebkitTapHighlightColor: 'transparent',
-          touchAction: 'none'
-        }}
-      />
-      <a 
-        href="https://github.com/robert-kratz/flappy-bird" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="mt-4 text-white/80 hover:text-white transition-colors duration-200 text-sm flex items-center gap-2"
-      >
-        View on GitHub
-      </a>
-      <SoundToggle />
-    </div>
-  );
+        // Set initial state from URL hash if present
+        const hash = window.location.hash.slice(1);
+        if (hash && Object.values(GameState).includes(hash as GameState)) {
+            manager.changeState(hash as GameState);
+        }
+
+        return () => {
+            // Clean up event listeners
+            document.removeEventListener('touchstart', preventDefaultTouch);
+            document.removeEventListener('touchmove', preventDefaultTouch);
+            document.removeEventListener('touchend', preventDefaultTouch);
+
+            if (canvasRef.current) {
+                canvasRef.current.removeEventListener('contextmenu', preventContextMenu);
+                canvasRef.current.removeEventListener('selectstart', preventSelection);
+            }
+
+            manager.cleanup();
+        };
+    }, [location.pathname]);
+
+    return (
+        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center touch-none select-none">
+            <canvas
+                ref={canvasRef}
+                className="border border-gray-700 rounded-lg shadow-lg touch-none"
+                style={{
+                    imageRendering: 'pixelated',
+                    WebkitTapHighlightColor: 'transparent',
+                    touchAction: 'none',
+                }}
+            />
+            <SoundToggle />
+        </div>
+    );
 }
 
 export default GameComponent;
