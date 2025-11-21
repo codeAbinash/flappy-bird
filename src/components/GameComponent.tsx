@@ -23,6 +23,10 @@ function GameComponent() {
 
         // Prevent default touch behaviors
         const preventDefaultTouch = (e: TouchEvent) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('button')) {
+                return;
+            }
             e.preventDefault();
         };
 
@@ -47,7 +51,7 @@ function GameComponent() {
 
         // Set canvas size to higher resolution (2x for sharper rendering)
         // const scale = window.devicePixelRatio || 1.5;
-        const scale = 1.5;
+        const scale = 1;
         const displayWidth = window.innerWidth;
         const displayHeight = window.innerHeight;
 
