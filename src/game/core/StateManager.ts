@@ -31,7 +31,7 @@ export class GameStateManager {
     private readonly pipeSpawnInterval: number = 1500;
     private groundOffset: number = 0;
     private readonly groundSpeed: number = 2;
-    private readonly groundHeight: number = 50;
+    private readonly groundHeight: number = 70;
     private backgroundGradient: CanvasGradient;
     private assets: ReturnType<typeof getAssets>;
     private deathTime: number = 0;
@@ -213,7 +213,8 @@ export class GameStateManager {
             this.frontHills.forEach((hill) => hill.update());
 
             // Update ground
-            this.groundOffset = (this.groundOffset - this.groundSpeed) % 20;
+            const groundWidth = this.assets.background.groundWidth || 20;
+            this.groundOffset = (this.groundOffset - this.groundSpeed) % groundWidth;
         }
 
         switch (this.currentState) {
@@ -320,14 +321,26 @@ export class GameStateManager {
         // Draw front hills
         this.frontHills.forEach((hill) => hill.render(this.ctx, this.displayHeight - this.groundHeight));
 
-        // Draw animated ground pattern
-        this.ctx.fillStyle = this.assets.background.groundColor;
-        this.ctx.fillRect(0, this.displayHeight - this.groundHeight, this.displayWidth, this.groundHeight);
+        // Draw ground
+        if (this.assets.background.renderGround) {
+            this.assets.background.renderGround(
+                this.ctx,
+                0,
+                this.displayHeight - this.groundHeight,
+                this.displayWidth,
+                this.groundHeight,
+                this.groundOffset
+            );
+        } else {
+            // Draw animated ground pattern (fallback)
+            this.ctx.fillStyle = this.assets.background.groundColor;
+            this.ctx.fillRect(0, this.displayHeight - this.groundHeight, this.displayWidth, this.groundHeight);
 
-        // Draw ground pattern
-        this.ctx.fillStyle = this.assets.background.groundPatternColor;
-        for (let x = this.groundOffset; x < this.displayWidth; x += 20) {
-            this.ctx.fillRect(x, this.displayHeight - this.groundHeight, 10, this.groundHeight);
+            // Draw ground pattern
+            this.ctx.fillStyle = this.assets.background.groundPatternColor;
+            for (let x = this.groundOffset; x < this.displayWidth; x += 20) {
+                this.ctx.fillRect(x, this.displayHeight - this.groundHeight, 10, this.groundHeight);
+            }
         }
     }
 

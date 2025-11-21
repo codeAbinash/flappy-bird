@@ -20,6 +20,15 @@ export interface GameAssets {
             back: string;
             front: string;
         };
+        groundWidth?: number;
+        renderGround?: (
+            ctx: CanvasRenderingContext2D,
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            offset: number
+        ) => void;
     };
     explosion?: {
         size: number;
@@ -27,6 +36,18 @@ export interface GameAssets {
         renderFrame2: (ctx: CanvasRenderingContext2D, x: number, y: number) => void;
     };
 }
+
+const birdImage = new Image();
+birdImage.src = '/bird.png';
+
+const groundImage = new Image();
+groundImage.src = '/ground.png';
+
+const pipeTopImage = new Image();
+pipeTopImage.src = '/cano_topo.png';
+
+const pipeBottomImage = new Image();
+pipeBottomImage.src = '/cano_baixo.png';
 
 const birdAssets: GameAssets = {
     characterSprite: {
@@ -39,35 +60,41 @@ const birdAssets: GameAssets = {
             ctx.translate(x, y);
             ctx.rotate(rotation);
 
-            // Bird body
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
-            gradient.addColorStop(0, '#FFD700');
-            gradient.addColorStop(1, '#FFA500');
+            if (birdImage.complete && birdImage.naturalWidth !== 0) {
+                // Draw image
+                const size = 40;
+                ctx.drawImage(birdImage, -size / 2, -size / 2, size, size);
+            } else {
+                // Fallback: Bird body
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
+                gradient.addColorStop(0, '#FFD700');
+                gradient.addColorStop(1, '#FFA500');
 
-            ctx.beginPath();
-            ctx.arc(0, 0, 15, 0, Math.PI * 2);
-            ctx.fillStyle = gradient;
-            ctx.fill();
+                ctx.beginPath();
+                ctx.arc(0, 0, 15, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
 
-            // Wing
-            ctx.fillStyle = '#FFD700';
-            const wingHeight = wingFrame === 1 ? 8 : 12;
-            ctx.fillRect(-5, -wingHeight / 2, 10, wingHeight);
+                // Wing
+                ctx.fillStyle = '#FFD700';
+                const wingHeight = wingFrame === 1 ? 8 : 12;
+                ctx.fillRect(-5, -wingHeight / 2, 10, wingHeight);
 
-            // Eye
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(8, -5, 3, 0, Math.PI * 2);
-            ctx.fill();
+                // Eye
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(8, -5, 3, 0, Math.PI * 2);
+                ctx.fill();
 
-            // Beak
-            ctx.fillStyle = '#FF6B6B';
-            ctx.beginPath();
-            ctx.moveTo(12, 0);
-            ctx.lineTo(20, -3);
-            ctx.lineTo(20, 3);
-            ctx.closePath();
-            ctx.fill();
+                // Beak
+                ctx.fillStyle = '#FF6B6B';
+                ctx.beginPath();
+                ctx.moveTo(12, 0);
+                ctx.lineTo(20, -3);
+                ctx.lineTo(20, 3);
+                ctx.closePath();
+                ctx.fill();
+            }
 
             ctx.restore();
         },
@@ -77,20 +104,51 @@ const birdAssets: GameAssets = {
         baseColor: '#2ECC71',
         edgeColor: '#27AE60',
         render: (ctx: CanvasRenderingContext2D, x: number, y: number, height: number, isTop: boolean) => {
-            const gradient = ctx.createLinearGradient(x, 0, x + 52, 0);
-            gradient.addColorStop(0, '#2ECC71');
-            gradient.addColorStop(0.5, '#27AE60');
-            gradient.addColorStop(1, '#2ECC71');
+            const image = isTop ? pipeTopImage : pipeBottomImage;
 
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x, y, 52, height);
+            if (image.complete && image.naturalWidth !== 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(x, y, 52, height);
+                ctx.clip();
 
-            // Edge
-            ctx.fillStyle = '#27AE60';
-            if (isTop) {
-                ctx.fillRect(x - 5, y + height - 5, 62, 5);
+                if (isTop) {
+                    // Top pipe: align bottom of image with bottom of pipe rect
+                    // If pipe is longer than image, repeat the top part (body) or just stretch?
+                    // For now, let's just draw it aligned to bottom.
+                    // If the image is not tall enough, we'll fill the gap with a color matching the pipe body.
+
+                    // Fill background to cover gaps if pipe is very long
+                    ctx.fillStyle = '#2ECC71'; // Match typical pipe color
+                    ctx.fillRect(x, y, 52, height);
+
+                    ctx.drawImage(image, x, y + height - image.height, 52, image.height);
+                } else {
+                    // Bottom pipe: align top of image with top of pipe rect
+
+                    // Fill background
+                    ctx.fillStyle = '#2ECC71';
+                    ctx.fillRect(x, y, 52, height);
+
+                    ctx.drawImage(image, x, y, 52, image.height);
+                }
+                ctx.restore();
             } else {
-                ctx.fillRect(x - 5, y, 62, 5);
+                const gradient = ctx.createLinearGradient(x, 0, x + 52, 0);
+                gradient.addColorStop(0, '#2ECC71');
+                gradient.addColorStop(0.5, '#27AE60');
+                gradient.addColorStop(1, '#2ECC71');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, 52, height);
+
+                // Edge
+                ctx.fillStyle = '#27AE60';
+                if (isTop) {
+                    ctx.fillRect(x - 5, y + height - 5, 62, 5);
+                } else {
+                    ctx.fillRect(x - 5, y, 62, 5);
+                }
             }
         },
     },
@@ -102,7 +160,45 @@ const birdAssets: GameAssets = {
             back: '#1A8C4A',
             front: '#19b35a',
         },
+        groundWidth: 336,
+        renderGround: (
+            ctx: CanvasRenderingContext2D,
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            offset: number
+        ) => {
+            if (groundImage.complete && groundImage.naturalWidth > 0) {
+                const pattern = ctx.createPattern(groundImage, 'repeat-x');
+                if (pattern) {
+                    ctx.save();
+                    ctx.fillStyle = pattern;
+                    ctx.translate(offset, y);
+                    // Draw slightly wider to cover scrolling
+                    ctx.fillRect(-offset, 0, width + Math.abs(offset), height);
+                    ctx.restore();
+                    return;
+                }
+            }
+
+            // Fallback: Procedural ground
+            ctx.fillStyle = '#2ECC71';
+            ctx.fillRect(x, y, width, height);
+
+            ctx.fillStyle = '#27AE60';
+            const localOffset = offset % 20;
+            for (let i = localOffset; i < width; i += 20) {
+                ctx.fillRect(x + i, y, 10, height);
+            }
+        },
     },
+};
+
+groundImage.onload = () => {
+    if (birdAssets.background && groundImage.naturalWidth > 0) {
+        birdAssets.background.groundWidth = groundImage.naturalWidth;
+    }
 };
 
 const planeAssets: GameAssets = {
@@ -210,6 +306,7 @@ const planeAssets: GameAssets = {
             back: '#2d2d2d',
             front: '#3d3d3d',
         },
+        groundWidth: 20,
     },
     explosion: {
         size: 60,
