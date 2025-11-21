@@ -22,9 +22,9 @@ export class GameStateManager {
     private audioManager: AudioManager;
     private score: number = 0;
     private nextPipeSpawn: number = 0;
-    private readonly pipeSpawnInterval: number = 1500;
+    private readonly pipeSpawnInterval: number = 1300;
     private groundOffset: number = 0;
-    private readonly groundSpeed: number = 2;
+    private readonly groundSpeed: number = 4;
     private readonly groundHeight: number = 70;
     private backgroundGradient: CanvasGradient;
     private assets: ReturnType<typeof getAssets>;

@@ -18,7 +18,7 @@ function MoneyCounter({ score }: { score: number }) {
 
     return (
         <>
-            <audio ref={jackpotSoundRef} src="/games/flappy_bird/jackpot.mp3" />
+            <audio ref={jackpotSoundRef} src="/sounds/jackpot.mp3" />
             <div className="fixed top-4 right-4 z-50">
                 <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-amber-500 blur-xl opacity-50 animate-pulse"></div>

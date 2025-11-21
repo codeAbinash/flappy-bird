@@ -5,11 +5,8 @@
     "": {
       "name": "vite-react-typescript-starter",
       "dependencies": {
-        "caniuse-lite": "^1.0.30001756",
         "howler": "^2.2.4",
         "lucide-react": "^0.344.0",
-        "prettier": "^3.6.2",
-        "prettier-plugin-tailwindcss": "^0.7.1",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "react-helmet-async": "^2.0.4",
@@ -27,6 +24,8 @@
         "eslint-plugin-react-refresh": "^0.4.11",
         "globals": "^15.9.0",
         "postcss": "^8.4.35",
+        "prettier": "^3.6.2",
+        "prettier-plugin-tailwindcss": "^0.7.1",
         "tailwindcss": "^3.4.1",
         "typescript": "^5.5.3",
         "typescript-eslint": "^8.3.0",
@@ -275,7 +274,7 @@
 
     "camelcase-css": ["camelcase-css@2.0.1", "", {}, "sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA=="],
 
-    "caniuse-lite": ["caniuse-lite@1.0.30001756", "", {}, "sha512-4HnCNKbMLkLdhJz3TToeVWHSnfJvPaq6vu/eRP0Ahub/07n484XHhBF5AJoSGHdVrS8tKFauUQz8Bp9P7LVx7A=="],
+    "caniuse-lite": ["caniuse-lite@1.0.30001667", "", {}, "sha512-7LTwJjcRkzKFmtqGsibMeuXmvFDfZq/nzIjnmgCGzKKRVzjD72selLDK1oPF/Oxzmt4fNcPvTDvGqSDG4tCALw=="],
 
     "chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
 
@@ -630,10 +629,6 @@
     "@typescript-eslint/typescript-estree/semver": ["semver@7.6.3", "", { "bin": "bin/semver.js" }, "sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A=="],
 
     "@typescript-eslint/visitor-keys/eslint-visitor-keys": ["eslint-visitor-keys@3.4.3", "", {}, "sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag=="],
-
-    "autoprefixer/caniuse-lite": ["caniuse-lite@1.0.30001667", "", {}, "sha512-7LTwJjcRkzKFmtqGsibMeuXmvFDfZq/nzIjnmgCGzKKRVzjD72selLDK1oPF/Oxzmt4fNcPvTDvGqSDG4tCALw=="],
-
-    "browserslist/caniuse-lite": ["caniuse-lite@1.0.30001667", "", {}, "sha512-7LTwJjcRkzKFmtqGsibMeuXmvFDfZq/nzIjnmgCGzKKRVzjD72selLDK1oPF/Oxzmt4fNcPvTDvGqSDG4tCALw=="],
 
     "chokidar/glob-parent": ["glob-parent@5.1.2", "", { "dependencies": { "is-glob": "^4.0.1" } }, "sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow=="],
 

@@ -3,9 +3,9 @@ import { GameAssets } from '../../config/assetConfigs';
 export class Pipe {
     private x: number;
     private gapY: number;
-    private readonly gapHeight: number = 150;
+    private readonly gapHeight: number = 100;
     private readonly width: number;
-    private readonly speed: number = 2;
+    private readonly speed: number = 4;
     private scored: boolean = false;
     private readonly groundHeight: number = 50;
     private assets: GameAssets;

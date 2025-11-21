@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import getPrize from '../../utils/getScore';
 import AchievementDisplay from './components/AchievementDisplay';
 import CardCorners from './components/CardCorners';
@@ -55,12 +55,10 @@ const getPrizeTheme = (earnedMoney: number) => {
 
 export default function GameOverPopup({ onRestart, score }: { onRestart: () => void; score: number }) {
     const earnedMoney = useMemo(() => getPrize(score), [score]);
-    const gameOverSoundRef = useRef(null);
     const theme = useMemo(() => getPrizeTheme(earnedMoney), [earnedMoney]);
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <audio ref={gameOverSoundRef} src="/games/flappy_bird/game-over.mp3" />
             <div className="relative duration-500">
                 <div className="absolute inset-0 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 blur-lg opacity-30 animate-pulse" />
                 <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black border-2 border-red-500 rounded-sm p-4 shadow-2xl min-w-[260px] max-w-[300px]">
