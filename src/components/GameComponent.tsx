@@ -51,7 +51,7 @@ function GameComponent() {
 
         // Set canvas size to higher resolution (2x for sharper rendering)
         // const scale = window.devicePixelRatio || 1.5;
-        const scale = 1;
+        const scale = 1.5;
         const displayWidth = window.innerWidth;
         const displayHeight = window.innerHeight;
 
