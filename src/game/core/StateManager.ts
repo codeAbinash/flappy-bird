@@ -31,7 +31,7 @@ export class GameStateManager {
     private readonly pipeSpawnInterval: number = 1500;
     private groundOffset: number = 0;
     private readonly groundSpeed: number = 2;
-    private readonly groundHeight: number = 100;
+    private readonly groundHeight: number = 50;
     private backgroundGradient: CanvasGradient;
     private assets: ReturnType<typeof getAssets>;
     private deathTime: number = 0;
@@ -104,6 +104,7 @@ export class GameStateManager {
 
         this.inputManager.addHandler(GameState.READY, () => {
             this.changeState(GameState.PLAYING);
+            this.bird.flap();
             this.audioManager.play('swoosh');
         });
 

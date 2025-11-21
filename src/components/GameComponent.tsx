@@ -69,14 +69,12 @@ function GameComponent() {
     }, [location.pathname]);
 
     return (
-        <div className="fixed inset-0 bg-gray-900 flex items-center justify-center touch-none select-none overflow-hidden">
+        <div className="fixed inset-0 bg-gray-900 flex items-center justify-center select-none overflow-hidden">
             <canvas
                 ref={canvasRef}
-                className="touch-none"
                 style={{
                     imageRendering: 'pixelated',
                     WebkitTapHighlightColor: 'transparent',
-                    touchAction: 'none',
                 }}
             />
             <SoundToggle />

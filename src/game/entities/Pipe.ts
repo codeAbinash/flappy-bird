@@ -7,7 +7,7 @@ export class Pipe {
     private readonly width: number;
     private readonly speed: number = 2;
     private scored: boolean = false;
-    private readonly groundHeight: number = 100;
+    private readonly groundHeight: number = 50;
     private assets: GameAssets;
 
     constructor(canvasWidth: number, canvasHeight: number, assets: GameAssets) {
