@@ -38,8 +38,10 @@ export interface GameAssets {
     };
 }
 
-const birdImage = new Image();
-birdImage.src = '/bird.png';
+const birdImages = [new Image(), new Image(), new Image()];
+birdImages[0].src = '/bird1.png';
+birdImages[1].src = '/bird2.png';
+birdImages[2].src = '/bird3.png';
 
 const groundImage = new Image();
 groundImage.src = '/ground.png';
@@ -64,10 +66,12 @@ const birdAssets: GameAssets = {
             ctx.translate(x, y);
             ctx.rotate(rotation);
 
-            if (birdImage.complete && birdImage.naturalWidth !== 0) {
+            const currentImage = birdImages[wingFrame % 3];
+
+            if (currentImage.complete && currentImage.naturalWidth !== 0) {
                 // Draw image
                 const size = 40;
-                ctx.drawImage(birdImage, -size / 2, -size / 2, size, size);
+                ctx.drawImage(currentImage, -size / 2, -size / 2, size, size);
             } else {
                 // Fallback: Bird body
                 const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
