@@ -1,5 +1,4 @@
 import React from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
 import { AudioManager } from '../game/core/AudioManager';
 
 export default function SoundToggle() {
@@ -19,7 +18,7 @@ export default function SoundToggle() {
             onClick={toggleSound}
             className="fixed bottom-4 right-4 p-3 bg-white/10 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/20 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 touch-manipulation"
             aria-label={isMuted ? 'Unmute sound' : 'Mute sound'}>
-            {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />}
+            {/* {isMuted ? <VolumeX className="w-6 h-6 text-white" /> : <Volume2 className="w-6 h-6 text-white" />} */}
         </button>
     );
 }

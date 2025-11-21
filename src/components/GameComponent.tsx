@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { GameLoop } from '../game/core/GameLoop';
-import { GameStateManager, GameState } from '../game/core/StateManager';
+import { GameState, GameStateManager } from '../game/core/StateManager';
 import SoundToggle from './SoundToggle';
 
 function GameComponent() {
@@ -36,9 +36,9 @@ function GameComponent() {
         canvasRef.current.addEventListener('contextmenu', preventContextMenu);
         canvasRef.current.addEventListener('selectstart', preventSelection);
 
-        // Set canvas size
-        canvasRef.current.width = 320;
-        canvasRef.current.height = 480;
+        // Set canvas size to fullscreen
+        canvasRef.current.width = window.innerWidth;
+        canvasRef.current.height = window.innerHeight;
 
         // Initialize game with current route
         const manager = new GameStateManager(canvasRef.current, location.pathname);
@@ -69,10 +69,10 @@ function GameComponent() {
     }, [location.pathname]);
 
     return (
-        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center touch-none select-none">
+        <div className="fixed inset-0 bg-gray-900 flex items-center justify-center touch-none select-none overflow-hidden">
             <canvas
                 ref={canvasRef}
-                className="border border-gray-700 rounded-lg shadow-lg touch-none"
+                className="touch-none"
                 style={{
                     imageRendering: 'pixelated',
                     WebkitTapHighlightColor: 'transparent',
