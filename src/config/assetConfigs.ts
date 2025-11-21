@@ -21,6 +21,7 @@ export interface GameAssets {
             front: string;
         };
         groundWidth?: number;
+        renderBackground?: (ctx: CanvasRenderingContext2D, width: number, height: number) => boolean;
         renderGround?: (
             ctx: CanvasRenderingContext2D,
             x: number,
@@ -42,6 +43,9 @@ birdImage.src = '/bird.png';
 
 const groundImage = new Image();
 groundImage.src = '/ground.png';
+
+const backgroundImage = new Image();
+backgroundImage.src = '/background.png';
 
 const pipeTopImage = new Image();
 pipeTopImage.src = '/cano_topo.png';
@@ -161,6 +165,22 @@ const birdAssets: GameAssets = {
             front: '#19b35a',
         },
         groundWidth: 336,
+        renderBackground: (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+            if (backgroundImage.complete && backgroundImage.naturalWidth > 0) {
+                // Calculate scale to fit height while maintaining aspect ratio
+                const scale = height / backgroundImage.naturalHeight;
+                const scaledWidth = backgroundImage.naturalWidth * scale;
+
+                // Calculate how many times we need to repeat to fill width
+                const repeatCount = Math.ceil(width / scaledWidth);
+
+                for (let i = 0; i < repeatCount; i++) {
+                    ctx.drawImage(backgroundImage, i * scaledWidth, 0, scaledWidth, height);
+                }
+                return true;
+            }
+            return false;
+        },
         renderGround: (
             ctx: CanvasRenderingContext2D,
             x: number,

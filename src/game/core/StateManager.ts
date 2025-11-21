@@ -1,7 +1,5 @@
 import { getAssets } from '../../config/assetConfigs';
 import { Bird } from '../entities/Bird';
-import { Cloud } from '../entities/Cloud';
-import { Hill } from '../entities/Hill';
 import { Pipe } from '../entities/Pipe';
 import { AudioManager } from './AudioManager';
 import { InputManager } from './InputManager';
@@ -20,9 +18,6 @@ export class GameStateManager {
     private ctx: CanvasRenderingContext2D;
     private bird: Bird;
     private pipes: Pipe[] = [];
-    private clouds: Cloud[] = [];
-    private frontHills: Hill[] = [];
-    private backHills: Hill[] = [];
     private inputManager: InputManager;
     private audioManager: AudioManager;
     private score: number = 0;
@@ -79,9 +74,6 @@ export class GameStateManager {
         this.backgroundGradient.addColorStop(0, this.assets.background.skyGradient[0]);
         this.backgroundGradient.addColorStop(1, this.assets.background.skyGradient[1]);
 
-        // Initialize background elements
-        this.initializeBackgroundElements();
-
         // Initialize managers
         this.bird = new Bird(this.displayWidth * 0.3, this.displayHeight * 0.5, this.assets);
         this.inputManager = new InputManager(canvas);
@@ -106,16 +98,7 @@ export class GameStateManager {
     }
 
     private initializeBackgroundElements(): void {
-        // Create more clouds for better coverage across the 5x width
-        for (let i = 0; i < 12; i++) {
-            this.clouds.push(new Cloud(this.displayWidth, this.displayHeight));
-        }
-
-        // Create hills (back layer)
-        this.backHills = [new Hill(this.displayWidth, this.displayHeight, true)];
-
-        // Create hills (front layer)
-        this.frontHills = [new Hill(this.displayWidth, this.displayHeight, false)];
+        // Removed background elements (clouds, hills) for performance
     }
 
     public cleanup(): void {
@@ -205,13 +188,6 @@ export class GameStateManager {
     public update(deltaTime: number): void {
         // Update parallax elements even in title screen
         if (this.currentState !== GameState.GAME_OVER) {
-            // Update clouds
-            this.clouds.forEach((cloud) => cloud.update());
-
-            // Update hills
-            this.backHills.forEach((hill) => hill.update());
-            this.frontHills.forEach((hill) => hill.update());
-
             // Update ground
             const groundWidth = this.assets.background.groundWidth || 20;
             this.groundOffset = (this.groundOffset - this.groundSpeed) % groundWidth;
@@ -308,18 +284,20 @@ export class GameStateManager {
     }
 
     private renderBackground(): void {
-        // Draw sky gradient
-        this.ctx.fillStyle = this.backgroundGradient;
-        this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+        let backgroundRendered = false;
+        if (this.assets.background.renderBackground) {
+            backgroundRendered = this.assets.background.renderBackground(
+                this.ctx,
+                this.displayWidth,
+                this.displayHeight
+            );
+        }
 
-        // Draw clouds
-        this.clouds.forEach((cloud) => cloud.render(this.ctx));
-
-        // Draw back hills
-        this.backHills.forEach((hill) => hill.render(this.ctx, this.displayHeight - this.groundHeight));
-
-        // Draw front hills
-        this.frontHills.forEach((hill) => hill.render(this.ctx, this.displayHeight - this.groundHeight));
+        if (!backgroundRendered) {
+            // Draw sky gradient
+            this.ctx.fillStyle = this.backgroundGradient;
+            this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
+        }
 
         // Draw ground
         if (this.assets.background.renderGround) {
