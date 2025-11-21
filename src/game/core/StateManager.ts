@@ -1,10 +1,10 @@
+import { getAssets } from '../../config/assetConfigs';
 import { Bird } from '../entities/Bird';
-import { Pipe } from '../entities/Pipe';
 import { Cloud } from '../entities/Cloud';
 import { Hill } from '../entities/Hill';
-import { InputManager } from './InputManager';
+import { Pipe } from '../entities/Pipe';
 import { AudioManager } from './AudioManager';
-import { getAssets } from '../../config/assetConfigs';
+import { InputManager } from './InputManager';
 
 export enum GameState {
     TITLE = 'title',
@@ -40,8 +40,11 @@ export class GameStateManager {
     private readonly explosionDuration: number = 2000;
     private readonly explosionFrameInterval: number = 200;
     private deathPosition: { x: number; y: number } | null = null;
+    private displayWidth: number;
+    private displayHeight: number;
+    private scale: number;
 
-    constructor(canvas: HTMLCanvasElement, route: string = '/') {
+    constructor(canvas: HTMLCanvasElement, route: string = '/', displayWidth?: number, displayHeight?: number) {
         this.canvas = canvas;
         const context = canvas.getContext('2d');
         if (!context) {
@@ -50,8 +53,15 @@ export class GameStateManager {
         this.ctx = context;
         this.assets = getAssets(route);
 
+        // Use logical display size for game coordinates
+        this.displayWidth = displayWidth || canvas.width;
+        this.displayHeight = displayHeight || canvas.height;
+        this.scale = canvas.width / this.displayWidth;
+
+        this.ctx.scale(this.scale, this.scale);
+
         // Create background gradient
-        this.backgroundGradient = this.ctx.createLinearGradient(0, 0, 0, canvas.height);
+        this.backgroundGradient = this.ctx.createLinearGradient(0, 0, 0, this.displayHeight);
         this.backgroundGradient.addColorStop(0, this.assets.background.skyGradient[0]);
         this.backgroundGradient.addColorStop(1, this.assets.background.skyGradient[1]);
 
@@ -59,7 +69,7 @@ export class GameStateManager {
         this.initializeBackgroundElements();
 
         // Initialize managers
-        this.bird = new Bird(canvas.width * 0.3, canvas.height * 0.5, this.assets);
+        this.bird = new Bird(this.displayWidth * 0.3, this.displayHeight * 0.5, this.assets);
         this.inputManager = new InputManager(canvas);
         this.audioManager = AudioManager.getInstance();
 
@@ -76,14 +86,14 @@ export class GameStateManager {
     private initializeBackgroundElements(): void {
         // Create more clouds for better coverage across the 5x width
         for (let i = 0; i < 12; i++) {
-            this.clouds.push(new Cloud(this.canvas.width, this.canvas.height));
+            this.clouds.push(new Cloud(this.displayWidth, this.displayHeight));
         }
 
         // Create hills (back layer)
-        this.backHills = [new Hill(this.canvas.width, this.canvas.height, true)];
+        this.backHills = [new Hill(this.displayWidth, this.displayHeight, true)];
 
         // Create hills (front layer)
-        this.frontHills = [new Hill(this.canvas.width, this.canvas.height, false)];
+        this.frontHills = [new Hill(this.displayWidth, this.displayHeight, false)];
     }
 
     public cleanup(): void {
@@ -121,7 +131,7 @@ export class GameStateManager {
     }
 
     private resetGame(): void {
-        this.bird.reset(this.canvas.width * 0.3, this.canvas.height * 0.5);
+        this.bird.reset(this.displayWidth * 0.3, this.displayHeight * 0.5);
         this.pipes = [];
         this.score = 0;
         this.nextPipeSpawn = 0;
@@ -195,7 +205,7 @@ export class GameStateManager {
         // Spawn new pipes
         this.nextPipeSpawn -= deltaTime;
         if (this.nextPipeSpawn <= 0) {
-            this.pipes.push(new Pipe(this.canvas.width, this.canvas.height, this.assets));
+            this.pipes.push(new Pipe(this.displayWidth, this.displayHeight, this.assets));
             this.nextPipeSpawn = this.pipeSpawnInterval;
         }
 
@@ -230,7 +240,7 @@ export class GameStateManager {
 
         // Check ground collision
         const birdPos = this.bird.getPosition();
-        if (birdPos.y > this.canvas.height - this.groundHeight - this.bird.getRadius()) {
+        if (birdPos.y > this.displayHeight - this.groundHeight - this.bird.getRadius()) {
             this.audioManager.play('hit');
             this.updateHighScore();
             if (window.location.pathname === '/black-humor') {
@@ -256,30 +266,30 @@ export class GameStateManager {
     private renderBackground(): void {
         // Draw sky gradient
         this.ctx.fillStyle = this.backgroundGradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
 
         // Draw clouds
         this.clouds.forEach((cloud) => cloud.render(this.ctx));
 
         // Draw back hills
-        this.backHills.forEach((hill) => hill.render(this.ctx, this.canvas.height - this.groundHeight));
+        this.backHills.forEach((hill) => hill.render(this.ctx, this.displayHeight - this.groundHeight));
 
         // Draw front hills
-        this.frontHills.forEach((hill) => hill.render(this.ctx, this.canvas.height - this.groundHeight));
+        this.frontHills.forEach((hill) => hill.render(this.ctx, this.displayHeight - this.groundHeight));
 
         // Draw animated ground pattern
         this.ctx.fillStyle = this.assets.background.groundColor;
-        this.ctx.fillRect(0, this.canvas.height - this.groundHeight, this.canvas.width, this.groundHeight);
+        this.ctx.fillRect(0, this.displayHeight - this.groundHeight, this.displayWidth, this.groundHeight);
 
         // Draw ground pattern
         this.ctx.fillStyle = this.assets.background.groundPatternColor;
-        for (let x = this.groundOffset; x < this.canvas.width; x += 20) {
-            this.ctx.fillRect(x, this.canvas.height - this.groundHeight, 10, this.groundHeight);
+        for (let x = this.groundOffset; x < this.displayWidth; x += 20) {
+            this.ctx.fillRect(x, this.displayHeight - this.groundHeight, 10, this.groundHeight);
         }
     }
 
     public render(): void {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.displayWidth, this.displayHeight);
         this.renderBackground();
 
         switch (this.currentState) {
@@ -306,15 +316,15 @@ export class GameStateManager {
         this.ctx.fillStyle = window.location.pathname === '/black-humor' ? '#FFF' : '#000';
         this.ctx.font = 'bold 40px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Flappy Bird', this.canvas.width / 2, this.canvas.height / 2 - 40);
+        this.ctx.fillText('Flappy Bird', this.displayWidth / 2, this.displayHeight / 2 - 40);
 
         this.ctx.font = '20px Arial';
-        this.ctx.fillText('Click to Start', this.canvas.width / 2, this.canvas.height / 2 + 20);
+        this.ctx.fillText('Click to Start', this.displayWidth / 2, this.displayHeight / 2 + 20);
 
         // High score display
         if (this.highScore > 0) {
             this.ctx.font = '24px Arial';
-            this.ctx.fillText(`High Score: ${this.highScore}`, this.canvas.width / 2, this.canvas.height / 2 + 60);
+            this.ctx.fillText(`High Score: ${this.highScore}`, this.displayWidth / 2, this.displayHeight / 2 + 60);
         }
 
         this.bird.render(this.ctx);
@@ -327,10 +337,10 @@ export class GameStateManager {
         this.ctx.fillStyle = window.location.pathname === '/black-humor' ? '#FFF' : '#000';
         this.ctx.font = 'bold 40px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Ready!', this.canvas.width / 2, this.canvas.height / 2 - 40);
+        this.ctx.fillText('Ready!', this.displayWidth / 2, this.displayHeight / 2 - 40);
 
         this.ctx.font = '20px Arial';
-        this.ctx.fillText('Click to Begin', this.canvas.width / 2, this.canvas.height / 2 + 20);
+        this.ctx.fillText('Click to Begin', this.displayWidth / 2, this.displayHeight / 2 + 20);
     }
 
     private renderPlaying(): void {
@@ -344,7 +354,7 @@ export class GameStateManager {
         this.ctx.fillStyle = window.location.pathname === '/black-humor' ? '#FFF' : '#000';
         this.ctx.font = 'bold 40px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.score.toString(), this.canvas.width / 2, 50);
+        this.ctx.fillText(this.score.toString(), this.displayWidth / 2, 50);
     }
 
     private renderDying(): void {
@@ -364,7 +374,7 @@ export class GameStateManager {
         this.ctx.fillStyle = '#FFF';
         this.ctx.font = 'bold 40px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText(this.score.toString(), this.canvas.width / 2, 50);
+        this.ctx.fillText(this.score.toString(), this.displayWidth / 2, 50);
     }
 
     private renderGameOver(): void {
@@ -384,20 +394,20 @@ export class GameStateManager {
 
         // Semi-transparent overlay
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.fillRect(0, 0, this.displayWidth, this.displayHeight);
 
         // Game over text with shadow
         this.ctx.fillStyle = '#FFF';
         this.ctx.font = 'bold 40px Arial';
         this.ctx.textAlign = 'center';
-        this.ctx.fillText('Game Over', this.canvas.width / 2, this.canvas.height / 2 - 50);
+        this.ctx.fillText('Game Over', this.displayWidth / 2, this.displayHeight / 2 - 50);
 
         // Score display
         this.ctx.font = '30px Arial';
-        this.ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, this.canvas.height / 2);
-        this.ctx.fillText(`High Score: ${this.highScore}`, this.canvas.width / 2, this.canvas.height / 2 + 40);
+        this.ctx.fillText(`Score: ${this.score}`, this.displayWidth / 2, this.displayHeight / 2);
+        this.ctx.fillText(`High Score: ${this.highScore}`, this.displayWidth / 2, this.displayHeight / 2 + 40);
 
         this.ctx.font = '20px Arial';
-        this.ctx.fillText('Click to Try Again', this.canvas.width / 2, this.canvas.height / 2 + 80);
+        this.ctx.fillText('Click to Try Again', this.displayWidth / 2, this.displayHeight / 2 + 80);
     }
 }

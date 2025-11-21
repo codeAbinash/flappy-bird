@@ -36,12 +36,19 @@ function GameComponent() {
         canvasRef.current.addEventListener('contextmenu', preventContextMenu);
         canvasRef.current.addEventListener('selectstart', preventSelection);
 
-        // Set canvas size to fullscreen
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
+        // Set canvas size to higher resolution (2x for sharper rendering)
+        // const scale = window.devicePixelRatio || 1.5;
+        const scale = 1.5;
+        const displayWidth = window.innerWidth;
+        const displayHeight = window.innerHeight;
 
-        // Initialize game with current route
-        const manager = new GameStateManager(canvasRef.current, location.pathname);
+        canvasRef.current.width = displayWidth * scale;
+        canvasRef.current.height = displayHeight * scale;
+        canvasRef.current.style.width = `${displayWidth}px`;
+        canvasRef.current.style.height = `${displayHeight}px`;
+
+        // Initialize game with current route (pass logical size, not physical pixels)
+        const manager = new GameStateManager(canvasRef.current, location.pathname, displayWidth, displayHeight);
         setStateManager(manager);
 
         const gameLoop = new GameLoop(manager);
@@ -73,7 +80,7 @@ function GameComponent() {
             <canvas
                 ref={canvasRef}
                 style={{
-                    imageRendering: 'pixelated',
+                    imageRendering: 'auto',
                     WebkitTapHighlightColor: 'transparent',
                 }}
             />
