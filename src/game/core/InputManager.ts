@@ -1,9 +1,6 @@
 export class InputManager {
     private handlers: Map<string, () => void> = new Map();
     private enabled: boolean = true;
-    private touchStartTime: number = 0;
-    private readonly doubleTapThreshold: number = 300; // milliseconds
-    private lastTapTime: number = 0;
     private canvas: HTMLCanvasElement;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -50,15 +47,6 @@ export class InputManager {
         const currentState = (window.location.hash.slice(1) || 'title').toLowerCase();
         if (!this.enabled && currentState !== 'gameover') return;
 
-        const now = Date.now();
-
-        // Prevent double-tap zoom
-        if (now - this.lastTapTime < this.doubleTapThreshold) {
-            e.preventDefault();
-            return;
-        }
-
-        this.lastTapTime = now;
         this.triggerHandler();
     }
 
