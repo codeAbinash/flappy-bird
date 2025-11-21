@@ -21,7 +21,6 @@ export class GameStateManager {
     private inputManager: InputManager;
     private audioManager: AudioManager;
     private score: number = 0;
-    private highScore: number = 0;
     private nextPipeSpawn: number = 0;
     private readonly pipeSpawnInterval: number = 1500;
     private groundOffset: number = 0;
@@ -40,7 +39,6 @@ export class GameStateManager {
     private scale: number;
     private onStateChange?: (state: GameState) => void;
     private onScoreChange?: (score: number) => void;
-    private onHighScoreChange?: (highScore: number) => void;
 
     constructor(
         canvas: HTMLCanvasElement,
@@ -48,8 +46,7 @@ export class GameStateManager {
         displayWidth?: number,
         displayHeight?: number,
         onStateChange?: (state: GameState) => void,
-        onScoreChange?: (score: number) => void,
-        onHighScoreChange?: (highScore: number) => void
+        onScoreChange?: (score: number) => void
     ) {
         this.canvas = canvas;
         const context = canvas.getContext('2d');
@@ -60,7 +57,6 @@ export class GameStateManager {
         this.assets = getAssets(route);
         this.onStateChange = onStateChange;
         this.onScoreChange = onScoreChange;
-        this.onHighScoreChange = onHighScoreChange;
 
         // Use logical display size for game coordinates
         this.displayWidth = displayWidth || canvas.width;
@@ -79,19 +75,10 @@ export class GameStateManager {
         this.inputManager = new InputManager(canvas);
         this.audioManager = AudioManager.getInstance();
 
-        // Load high score from localStorage
-        const savedHighScore = localStorage.getItem('flappyBirdHighScore');
-        if (savedHighScore) {
-            this.highScore = parseInt(savedHighScore, 10);
-        }
-
         this.setupInputHandlers();
         this.changeState(GameState.TITLE);
 
         // Notify initial states
-        if (this.onHighScoreChange) {
-            this.onHighScoreChange(this.highScore);
-        }
         if (this.onScoreChange) {
             this.onScoreChange(this.score);
         }
@@ -145,17 +132,10 @@ export class GameStateManager {
         this.deathPosition = null;
         this.explosionFrame = 0;
         this.explosionTimer = 0;
-    }
 
-    private updateHighScore(): void {
-        if (this.score > this.highScore) {
-            this.highScore = this.score;
-            localStorage.setItem('flappyBirdHighScore', this.highScore.toString());
-
-            // Notify high score change
-            if (this.onHighScoreChange) {
-                this.onHighScoreChange(this.highScore);
-            }
+        // Notify score change
+        if (this.onScoreChange) {
+            this.onScoreChange(this.score);
         }
     }
 
@@ -237,7 +217,6 @@ export class GameStateManager {
             const birdPos = this.bird.getPosition();
             if (pipe.checkCollision(birdPos.x, birdPos.y, this.bird.getRadius())) {
                 this.audioManager.play('hit');
-                this.updateHighScore();
                 if (window.location.pathname === '/black-humor') {
                     this.changeState(GameState.DYING);
                 } else {
@@ -262,7 +241,6 @@ export class GameStateManager {
         const birdPos = this.bird.getPosition();
         if (birdPos.y > this.displayHeight - this.groundHeight - this.bird.getRadius()) {
             this.audioManager.play('hit');
-            this.updateHighScore();
             if (window.location.pathname === '/black-humor') {
                 this.changeState(GameState.DYING);
             } else {
@@ -354,12 +332,6 @@ export class GameStateManager {
 
         this.ctx.font = '20px Arial';
         this.ctx.fillText('Click to Start', this.displayWidth / 2, this.displayHeight / 2 + 20);
-
-        // High score display
-        if (this.highScore > 0) {
-            this.ctx.font = '24px Arial';
-            this.ctx.fillText(`High Score: ${this.highScore}`, this.displayWidth / 2, this.displayHeight / 2 + 60);
-        }
 
         this.bird.render(this.ctx);
     }

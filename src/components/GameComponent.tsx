@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { GameLoop } from '../game/core/GameLoop';
 import { GameState, GameStateManager } from '../game/core/StateManager';
 import GameOverPopup from './GameOverPopup/GameOverPopup';
+import MoneyCounter from './MoneyCounter';
 import SoundToggle from './SoundToggle';
 
 function GameComponent() {
@@ -105,12 +106,12 @@ function GameComponent() {
                 }}
             />
 
-            {/* Score Display - Top Right */}
             {gameState === GameState.PLAYING && (
-                <div className="absolute top-8 right-8 text-white text-5xl font-bold drop-shadow-lg">{score}</div>
+                <div className="absolute top-6 left-6 text-white text-2xl font-bold drop-shadow-lg">{score}</div>
             )}
 
-            {/* Game Over Overlay */}
+            {gameState === GameState.PLAYING && <MoneyCounter score={score} />}
+
             {gameState === GameState.GAME_OVER && <GameOverPopup onRestart={handleRestart} score={score} />}
 
             <SoundToggle />
