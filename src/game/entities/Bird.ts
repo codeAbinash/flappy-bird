@@ -5,7 +5,7 @@ export class Bird {
     private y: number;
     private velocity: number = 0;
     private gravity: number = 0.5;
-    private flapStrength: number = -8;
+    private flapStrength: number = -10;
     private rotation: number = 0;
     private wingFrame: number = 0;
     private wingAnimationTimer: number = 0;
