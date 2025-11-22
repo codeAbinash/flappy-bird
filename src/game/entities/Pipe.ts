@@ -3,17 +3,18 @@ import { GameAssets } from '../../config/assetConfigs';
 export class Pipe {
     private x: number;
     private gapY: number;
-    private readonly gapHeight: number = 125;
+    private readonly gapHeight: number;
     private readonly width: number;
-    private readonly speed: number = 4;
+    private readonly speed: number = 3;
     private scored: boolean = false;
     private readonly groundHeight: number = 50;
     private assets: GameAssets;
 
-    constructor(canvasWidth: number, canvasHeight: number, assets: GameAssets) {
+    constructor(canvasWidth: number, canvasHeight: number, assets: GameAssets, gapHeight: number = 125) {
         this.x = canvasWidth;
         this.width = assets.obstacle.width;
         this.assets = assets;
+        this.gapHeight = gapHeight;
 
         const minGapY = this.gapHeight;
         const maxGapY = canvasHeight - this.groundHeight - this.gapHeight / 2;

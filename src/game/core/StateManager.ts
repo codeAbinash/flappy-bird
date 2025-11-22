@@ -21,10 +21,11 @@ export class GameStateManager {
     private inputManager: InputManager;
     private audioManager: AudioManager;
     private score: number = 0;
+    private pipeSpawnCount: number = 0;
     private nextPipeSpawn: number = 0;
     private readonly pipeSpawnInterval: number = 1300;
     private groundOffset: number = 0;
-    private readonly groundSpeed: number = 4;
+    private readonly groundSpeed: number = 3;
     private readonly groundHeight: number = 70;
     private backgroundGradient: CanvasGradient;
     private assets: ReturnType<typeof getAssets>;
@@ -126,6 +127,7 @@ export class GameStateManager {
         this.bird.reset(this.displayWidth * 0.3, this.displayHeight * 0.5);
         this.pipes = [];
         this.score = 0;
+        this.pipeSpawnCount = 0;
         this.nextPipeSpawn = 0;
         this.groundOffset = 0;
         this.inputManager.setEnabled(true);
@@ -200,7 +202,17 @@ export class GameStateManager {
         // Spawn new pipes
         this.nextPipeSpawn -= deltaTime;
         if (this.nextPipeSpawn <= 0) {
-            this.pipes.push(new Pipe(this.displayWidth, this.displayHeight, this.assets));
+            this.pipeSpawnCount++;
+
+            const startGap = 180;
+            const endGap = 125;
+            const initialPipes = 2;
+            const transitionPipes = 3;
+
+            const progress = Math.min(Math.max((this.pipeSpawnCount - initialPipes) / transitionPipes, 0), 1);
+            const gapHeight = startGap - (startGap - endGap) * progress;
+
+            this.pipes.push(new Pipe(this.displayWidth, this.displayHeight, this.assets, gapHeight));
             this.nextPipeSpawn = this.pipeSpawnInterval;
         }
 
