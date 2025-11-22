@@ -204,10 +204,10 @@ export class GameStateManager {
         if (this.nextPipeSpawn <= 0) {
             this.pipeSpawnCount++;
 
-            const startGap = 180;
+            const startGap = 140;
             const endGap = 125;
-            const initialPipes = 2;
-            const transitionPipes = 3;
+            const initialPipes = 3;
+            const transitionPipes = 4;
 
             const progress = Math.min(Math.max((this.pipeSpawnCount - initialPipes) / transitionPipes, 0), 1);
             const gapHeight = startGap - (startGap - endGap) * progress;
